@@ -72,8 +72,12 @@ class TimeStepModel(tf.keras.Model):
     self.grid = grid
     self.num_time_steps = num_time_steps
 
-    if target is None and len(equation.evolving_keys) == 1:
-      (target,) = equation.evolving_keys
+    #if target is None and len(equation.evolving_keys) == 1:
+    #  (target,) = equation.evolving_keys
+    #self.target = target
+
+    if target is None:
+        target = sorted(list(equation.evolving_keys))
     self.target = target
 
   def load_data(
@@ -119,7 +123,8 @@ class TimeStepModel(tf.keras.Model):
     advanced = tensor_ops.moveaxis(advanced, source=0, destination=1)
     # TODO(shoyer): support multiple targets, once keras does.
     # https://github.com/tensorflow/tensorflow/issues/25299
-    return advanced[self.target]
+    #return advanced[self.target]
+    return [advanced[t] for t in self.target]
 
   def time_derivative(
       self, state: Mapping[str, tf.Tensor]) -> Dict[str, tf.Tensor]:
